@@ -1,9 +1,9 @@
 #!/usr/bin/python3
-import argparse, subprocess, datetime, sys
+import argparse, subprocess, datetime, sys, os
 
 class argParser(argparse.ArgumentParser):
     def error(self, message):
-        sys.stderr.write(f"error: {message}\n\n")
+        sys.stderr.write(f"error: {message}\n")
         self.print_help()
         sys.exit(2)
 
@@ -23,5 +23,6 @@ with open("list", "w") as f:
         f.write(f"file '{file}'\n")
 
 date=datetime.datetime.now().strftime("%m.%d-%H.%M")
-subprocess.run(["ffmpeg", "-f", "concat", "-safe", "0", "-i", "list", "-c", "copy", f"{date}.mp4"])
-
+subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "list", "-c", "copy", "-f", "mp4", f"{date}-temp.mp4"])
+subprocess.run(["ffmpeg", "-i", f"{date}-temp.mp4", "-b:v", "5M", "-b:a", "120K", "-y", f"{date}.mp4"])
+os.remove(f"{date}-temp.mp4")
